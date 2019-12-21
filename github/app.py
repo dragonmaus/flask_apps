@@ -1,4 +1,5 @@
 import hmac
+import os.path
 import requests
 import uritemplate
 
@@ -79,7 +80,11 @@ def push():
             if p.returncode != 0:
                 return status(500, message='error cloning repository')
 
-            p = run(['git', '-C', d, 'archive', '--format=zip', tag], stdout=PIPE)
+            if os.path.exists(os.path.join(d, 'release.sh')):
+                p = run(['sh', os.path.join(d, 'release.sh')], stdout=PIPE, cwd=d)
+            else:
+                p = run(['git', '-C', d, 'archive', '--format=zip', tag], stdout=PIPE)
+
             if p.returncode != 0:
                 return status(500, message='error creating archive')
 
