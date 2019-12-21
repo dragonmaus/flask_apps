@@ -1,18 +1,12 @@
 __all__ = ['kebab2normal', 'status']
 
 from flask import jsonify, make_response
-
-codemap = {
-    200: 'ok',
-    400: 'bad_request',
-    401: 'unauthorized',
-    500: 'internal_error',
-}
+from werkzeug.http import HTTP_STATUS_CODES as status_codes
 
 def kebab2normal(s):
     return ' '.join(x.capitalize() for x in s.split('-'))
 
 def status(code, **kwargs):
-    payload = {'status': codemap[code]}
+    payload = {'status': status_codes[code]}
     payload.update(**kwargs)
     return make_response((jsonify(payload), code))
