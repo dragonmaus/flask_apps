@@ -9,6 +9,9 @@ codemap = {
     500: 'internal_error',
 }
 
+def kebab2normal(s):
+    return ' '.join(x.capitalize() for x in s.split('-'))
+
 def status(code, **kwargs):
     payload = {'status': codemap[code]}
     payload.update(**kwargs)

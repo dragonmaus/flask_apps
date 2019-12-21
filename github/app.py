@@ -2,7 +2,7 @@ import hmac
 import requests
 import uritemplate
 
-from ..common import status
+from ..common import kebab2normal, status
 from ..secret import authorization_key, github_token
 from flask import Flask, request
 from subprocess import PIPE, run
@@ -51,10 +51,11 @@ def push():
     tag = tag['tag']
 
     uri = uritemplate.expand(data['repository']['releases_url'])
+    name = data['repository']['name']
     payload = {
         'tag_name': tag,
         'target_commitish': data['repository']['default_branch'],
-        'name': f'Fantasque Magisk {tag}',
+        'name': f'{kebab2normal(name)} {tag}',
         'body': message,
         'draft': False,
         'prerelease': False,
@@ -88,7 +89,7 @@ def push():
         'Content-Length': str(len(b)),
         'Content-Type': 'application/zip',
     })
-    uri = uritemplate.expand(release['upload_url'], name='fantasque-magisk.zip')
+    uri = uritemplate.expand(release['upload_url'], name=f'{name}.zip')
     r = requests.post(uri, data=b, headers=headers)
 
     if r.status_code != 201:
