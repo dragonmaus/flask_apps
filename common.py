@@ -1,4 +1,4 @@
-__all__ = ['status']
+__all__ = ['kebab2normal', 'status']
 
 from flask import jsonify, make_response
 
