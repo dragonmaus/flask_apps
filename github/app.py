@@ -3,8 +3,8 @@ import os.path
 import requests
 import uritemplate
 
+from .. import secret
 from ..common import kebab2normal, status
-from ..secret import authorization_key, github_token
 from flask import Flask, request
 from subprocess import PIPE, run
 from tempfile import SpooledTemporaryFile, TemporaryDirectory
@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 @app.route('/push', methods=['POST'])
 def push():
-    signature = hmac.new(authorization_key.encode(), msg=request.get_data(), digestmod='sha1').hexdigest()
+    signature = hmac.new(secret.api_key, msg=request.get_data(), digestmod='sha1').hexdigest()
     if request.headers.get('X-Hub-Signature') != f'sha1={signature}':
         return status(401)
 
@@ -26,7 +26,7 @@ def push():
 
     headers = {
         'Accept': 'application/vnd.github.v3+json',
-        'Authorization': 'token {github_token}',
+        'Authorization': 'token {secret.token.github}',
     }
 
     uri = uritemplate.expand(data['repository']['git_refs_url']) + '/' + data['ref'].split('/', 1)[1]
