@@ -1,13 +1,13 @@
 import hmac
 import os.path
-import requests
-import uritemplate
-
-from .. import secret
-from ..common import kebab2normal, status
-from flask import Flask, request
 from subprocess import PIPE, run
 from tempfile import SpooledTemporaryFile, TemporaryDirectory
+
+import requests
+import uritemplate
+from flask import Flask, request
+
+from common import kebab2normal, secret, status
 
 app = Flask(__name__)
 

@@ -1,8 +1,8 @@
 import requests
 
-from .. import secret
-from ..common import status
 from flask import Flask, json, jsonify, request
+
+from common import secret, status
 
 app = Flask(__name__)
 

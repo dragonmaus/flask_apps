@@ -1,7 +1,7 @@
-__all__ = ['kebab2normal', 'status']
-
 from flask import jsonify, make_response
 from werkzeug.http import HTTP_STATUS_CODES as status_codes
+
+__all__ = ['kebab2normal', 'status']
 
 def kebab2normal(s):
     return ' '.join(x.capitalize() for x in s.split('-'))

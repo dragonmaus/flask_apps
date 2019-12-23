@@ -7,8 +7,7 @@ from flask import Flask, escape, g, jsonify, redirect, request, send_from_direct
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from .. import secret
-from ..common import status
+from common import secret, status
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'

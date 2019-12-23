@@ -1,3 +1,4 @@
+*.db
+/common/secret/
 __pycache__/
-secret/
 static/
