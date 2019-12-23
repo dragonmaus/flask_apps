@@ -11,12 +11,18 @@ from common import kebab2normal, secret, status
 
 app = Flask(__name__)
 
-@app.route('/push', methods=['POST'])
-def push():
-    signature = hmac.new(secret.api_key, msg=request.get_data(), digestmod='sha1').hexdigest()
-    if request.headers.get('X-Hub-Signature') != f'sha1={signature}':
-        return status(401)
+def api_key_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        signature = hmac.new(secret.api_key, msg=request.get_data(), digestmod='sha1').hexdigest()
+        if request.headers.get('X-Hub-Signature') != f'sha1={signature}':
+            return status(401)
+        return f(*args, **kwargs)
+    return decorated_function
 
+@app.route('/push', methods=['POST'])
+@api_key_required
+def push():
     data = request.get_json()
     if not data:
         return status(400)

@@ -6,11 +6,17 @@ from common import secret, status
 
 app = Flask(__name__)
 
-@app.route('/push', methods=['POST'])
-def push():
-    if request.headers.get('X-Gitlab-Token').encode() != secret.api_key:
-        return status(401)
+def api_key_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if request.headers.get('X-Gitlab-Token').encode() != secret.api_key:
+            return status(401)
+        return f(*args, **kwargs)
+    return decorated_function
 
+@app.route('/push', methods=['POST'])
+@api_key_required
+def push():
     with open('gitlab.request.headers', 'w') as f:
         json.dump(dict(request.headers), f)
     with open('gitlab.request.payload', 'wb') as f:

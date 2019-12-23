@@ -42,16 +42,6 @@ def check_auth(request):
         return user
     return None
 
-#def check_login(request):
-#    if 'username' in session:
-#        user = User.query.filter_by(name=session['username']).first()
-#    else:
-#        user = check_auth(request)
-#    if not user:
-#        return None
-#    session['username'] = user.name
-#    return user
-
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
