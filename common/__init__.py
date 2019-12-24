@@ -6,7 +6,7 @@ __all__ = ['kebab2normal', 'status']
 def kebab2normal(s):
     return ' '.join(x.capitalize() for x in s.split('-'))
 
-def status(code, **kwargs):
+def status(code, headers={}, **kwargs):
     payload = {'status': status_codes[code]}
     payload.update(**kwargs)
-    return make_response((jsonify(payload), code))
+    return make_response((jsonify(payload), code, headers))

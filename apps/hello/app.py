@@ -50,7 +50,7 @@ def login_required(f):
         else:
             user = check_auth(request)
         if not user:
-            return status(401)
+            return status(401, headers={'WWW-Authenticate': 'Basic realm="Login Required"'})
         g.user = user
         session['username'] = user.name
         return f(*args, **kwargs)
