@@ -1,5 +1,6 @@
 import hmac
 import os.path
+from functools import wraps
 from subprocess import PIPE, run
 from tempfile import SpooledTemporaryFile, TemporaryDirectory
 
