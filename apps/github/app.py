@@ -16,7 +16,7 @@ def api_key_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         signature = hmac.new(secret.api_key, msg=request.get_data(), digestmod='sha1').hexdigest()
-        if request.headers.get('X-Hub-Signature') != f'sha1={signature}':
+        if request.headers.get('X-Hub-Signature') != 'sha1=' + signature:
             return status(401)
         return f(*args, **kwargs)
     return decorated_function
@@ -28,12 +28,13 @@ def push():
     if not data:
         return status(400)
 
-    if not (data['created'] and data['ref'].startswith('refs/tags/')):
+    if not ('created' in data and data['created'] and \
+            'ref' in data and data['ref'].startswith('refs/tags/')):
         return status(200)
 
     headers = {
         'Accept': 'application/vnd.github.v3+json',
-        'Authorization': 'token {secret.token.github}',
+        'Authorization': 'token ' + secret.token.github,
     }
 
     uri = uritemplate.expand(data['repository']['git_refs_url']) + '/' + data['ref'].split('/', 1)[1]
@@ -63,14 +64,14 @@ def push():
     payload = {
         'tag_name': tag,
         'target_commitish': data['repository']['default_branch'],
-        'name': f'{kebab2normal(name)} {tag}',
+        'name': kebab2normal(name) + ' ' + tag,
         'body': message,
         'draft': False,
         'prerelease': False,
     }
     r = requests.post(uri, json=payload, headers=headers)
     if r.status_code == 422 and r.json()['errors'][0]['code'] == 'already_exists':
-        uri += f'/tags/{tag}'
+        uri += '/tags/' + tag
         r = requests.get(uri, headers=headers)
 
     if r.status_code not in [200, 201]:
@@ -88,7 +89,7 @@ def push():
                 return status(500, message='error cloning repository')
 
             if os.path.exists(os.path.join(d, 'release.sh')):
-                p = run(['sh', os.path.join(d, 'release.sh')], stdout=PIPE, cwd=d)
+                p = run(['sh', os.path.join(d, 'release.sh'), tag], stdout=PIPE, cwd=d)
             else:
                 p = run(['git', '-C', d, 'archive', '--format=zip', tag], stdout=PIPE)
 
@@ -101,7 +102,7 @@ def push():
         'Content-Length': str(len(b)),
         'Content-Type': 'application/zip',
     })
-    uri = uritemplate.expand(release['upload_url'], name=f'{name}.zip')
+    uri = uritemplate.expand(release['upload_url'], name=(name + '.zip'))
     r = requests.post(uri, data=b, headers=headers)
 
     if r.status_code != 201:
